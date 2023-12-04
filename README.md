@@ -1,0 +1,2 @@
+# Basics-of-16S-sequence-processing-on-LSF-cluster-servers
+This goes over the basics for processing 16S sequence data on a cluster server, using the LSF platform as the example. We will go over formatting a batch job, submitting a batch job, checking the status of jobs, and cancelling a job. Within QIIME, we will QC and trim the reads, create OTU tables, and annotate the taxonomic IDs using greengenes2.
