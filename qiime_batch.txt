@@ -1,0 +1,74 @@
+#!/bin/bash
+#SBATCH --partition=normal
+#SBATCH --ntasks=1
+#SBATCH --time=6:00:00
+#SBATCH --job-name=Assembly
+#SBATCH --mem=8G
+#SBATCH --output=16S_%J_stdout.txt
+#SBATCH --error=16S_%J_stderr.txt
+#SBATCH --mail-user=
+#SBATCH --mail-type=ALL
+#SBATCH --chdir=
+
+module load python
+module load QIIME2
+
+qiime tools import \
+ --type 'SampleData[PairedEndSequencesWithQuality]' \
+ --input-path sample_file_list.tsv \
+ --output-path paired-end-demux.qza \
+ --input-format PairedEndFastqManifestPhred33V2
+
+
+qiime demux summarize \
+ --i-data paired-end-demux.qza \
+ --o-visualization demux-summary-1.qzv
+ 
+qiime dada2 denoise-paired \
+  --p-trim-left-f 50 \
+  --p-trim-left-r 50 \
+  --p-trunc-len-f 300 \
+  --p-trunc-len-r 300 \
+  --i-demultiplexed-seqs paired-end-demux.qza \
+  --o-representative-sequences rep-seqs-1.qza \
+  --o-table table-1.qza \
+  --o-denoising-stats stats-1.qza
+
+qiime metadata tabulate \
+  --m-input-file stats-1.qza \
+  --o-visualization denoising-stats-1.qzv
+
+qiime feature-table summarize \
+  --i-table table-1.qza \
+  --o-visualization table.qzv \
+ 
+qiime feature-table tabulate-seqs \
+  --i-data rep-seqs-1.qza \
+  --o-visualization rep-seqs.qzv
+  
+qiime tools export \
+  --input-path table-1.qza \
+  --output-path exported-otu-table
+  
+#in the resulting folder:
+cd exported-otu-table
+biom convert -i feature-table.biom -o table.from_biom.txt --to-tsv
+cd ../ #need to move back to the main folder
+
+#greengenes2 code
+#https://forum.qiime2.org/t/introducing-greengenes2-2022-10/25291
+wget http://ftp.microbio.me/greengenes_release/2022.10/2022.10.backbone.full-length.fna.qza
+
+wget http://ftp.microbio.me/greengenes_release/2022.10/2022.10.taxonomy.asv.nwk.qza
+
+qiime greengenes2 non-v4-16s \
+    --i-table table-1.qza \
+    --i-sequences rep-seqs-1.qza \
+    --i-backbone 2022.10.backbone.full-length.fna.qza \
+    --o-mapped-table gg2.biom.qza \
+    --o-representatives icu.gg2.fna.qza
+
+qiime greengenes2 taxonomy-from-table \
+    --i-reference-taxonomy 2022.10.taxonomy.asv.nwk.qza \
+    --i-table gg2.biom.qza \
+    --o-classification gg2.taxonomy.qza
