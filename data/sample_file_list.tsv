@@ -1,0 +1,3 @@
+#SampleID	forward-absolute-filepath	reverse-absolute-filepath
+1	/scratch/suginoka/probiotic_blast/1_S25_R1_001.fastq.gz	/scratch/suginoka/probiotic_blast/1_S25_R2_001.fastq.gz
+2	/scratch/suginoka/probiotic_blast/2_S26_R1_001.fastq.gz	/scratch/suginoka/probiotic_blast/2_S26_R2_001.fastq.gz
