@@ -1,3 +1,25 @@
+-   [1
+    Basics-of-16S-sequence-processing-on-SGE-cluster-servers](#basics-of-16s-sequence-processing-on-sge-cluster-servers)
+    -   [1.1 Introduction: submitting batch jobs on SGE
+        servers](#introduction-submitting-batch-jobs-on-sge-servers)
+-   [2 Required files](#required-files)
+    -   [2.1 Annotation databases: greengenes2 and
+        SILVA](#annotation-databases-greengenes2-and-silva)
+-   [3 Batch file example](#batch-file-example)
+    -   [3.1 Basic LSF commands](#basic-lsf-commands)
+    -   [3.2 Example of LSF batch file for Mustang
+        servers](#example-of-lsf-batch-file-for-mustang-servers)
+
+# 1 Basics-of-16S-sequence-processing-on-SGE-cluster-servers
+
+This goes over the basics for processing 16S sequence data on a cluster
+server, using the LSF platform as the example. We will go over
+formatting a batch job, submitting a batch job, checking the status of
+jobs, and cancelling a job. Within QIIME, we will QC and trim the reads,
+create OTU tables, and annotate the taxonomic IDs using greengenes2.
+
+## 1.1 Introduction: submitting batch jobs on SGE servers
+
 -   This is a companion doc to the batchfile
     “qiime\_processing\_batch\_file.batch”, which contains the code to
     run a QIIME job on the HPC.
@@ -12,7 +34,7 @@
         -   More info can be found at:
             <https://www.med.upenn.edu/hpc/assets/user-content/documents/SGE_to_LSF_User_Migration_Guide.pdf>
 -   For our purposes, the only difference between the two is syntax.
-    Let’s look at the batchfile header for SGE on the Norman OSCER
+    Let’s look at the batch file header for SGE on the Norman OSCER
     servers, which uses qsub to submit jobs:
 
 <!-- -->
@@ -28,7 +50,7 @@
     #SBATCH --mail-type=ALL
     #SBATCH --chdir=
 
--   The commands in the header are fairly self-explainatory, so I won’t
+-   The commands in the header are fairly self-explanatory, so I won’t
     go into too many details here. But there are a few things you should
     be aware of, depending on the server/cluster/nodes you have access
     to
@@ -36,7 +58,7 @@
     -   Make sure each line starts with “\#”
     -   “–ntasks” sets the number of computing *nodes* that will be used
         by the program. Each node contains several processors (which can
-        also be coded into the batchfile, though it is not shown here).
+        also be coded into the batch file, though it is not shown here).
         If you use more processors (and/or nodes) than one, you’ll
         likely need to make sure that the program’s code itself
         specifies this.
@@ -51,6 +73,9 @@
             requesting more memory than is available on a given node;
             moreover, the more resources requested, the harder it can be
             to obtain server time
+
+# 2 Required files
+
 -   You’ll need a few files for your run:
     -   Raw sequencing files
     -   File with sample ID and file path to forward and reverse reads
@@ -60,14 +85,24 @@
     -   The base pair length of your sequencing region
         -   Here it is around 250 bp
     -   (optional) The primers used for sequencing (F/R)
+
+## 2.1 Annotation databases: greengenes2 and SILVA
+
 -   One other thing to note before we get into the code: I’m using the
-    greengenes2 database for this run. It’s required to get gene
-    annotation predictions form Picrust. The gg2 database was just
-    updated last year, but you can also use other annotation DBs like
-    SILVA (<https://www.arb-silva.de/>)
+    greengenes2 database for this run
+    (<https://forum.qiime2.org/t/introducing-greengenes2-2022-10/25291>).
+    It’s required to get gene annotation predictions from Picrust2
+    (<https://github.com/picrust/picrust2/wiki>).
+    -   Check the link to gg2 for other run conditions; notably, there
+        are different commands for V4 vs non-V4 sequencing regions.
+-   The gg2 database was just updated last year, but you can also use
+    other annotation DBs like SILVA (<https://www.arb-silva.de/>)
     -   If you use SILVA, you’ll need to look up how to download and
         process the database so that it is in a correct format for your
         needs; Google is your friend!
+
+# 3 Batch file example
+
 -   There are many pipelines online showing you how to use QIIME with
     different types of sequencing data, different annotation databases,
     etc. This is a pretty good one and covers more than we will here:
@@ -140,7 +175,7 @@
 
     ###
     #greengenes2 annotations
-    # See this link for more infor on gg2 and how to use it:
+    # See this link for more info on gg2 and how to use it:
       # https://forum.qiime2.org/t/introducing-greengenes2-2022-10/25291
       
     # need to download the database
@@ -159,6 +194,8 @@
         --i-reference-taxonomy 2022.10.taxonomy.asv.nwk.qza \
         --i-table gg2.biom.qza \
         --o-classification gg2.taxonomy.qza
+
+## 3.1 Basic LSF commands
 
 -   That’s basically it! Using the HPC servers is a whole other thing
     that I don’t want to get into, but to run this job on the OSCER
@@ -184,6 +221,8 @@
 
     scancel *jobID*
 
+## 3.2 Example of LSF batch file for Mustang servers
+
 -   So, I have less experience with LSF on the OUHSC servers, but I can
     show how I’ve been submitting jobs:
 
@@ -195,20 +234,21 @@
     #BSUB -e assembly_%J_stderr.txt
     #BSUB -n 4
 
-    eval "$(conda shell.bash hook)"
-    conda activate mpa
+    module load python
+    module load QIIME2
 
-    metaphlan CHO57M.merged_cat_output.fastq_u.fastq_ec.fastq.fixed_assembly.fastq_sequence_min1000.fastq --bowtie2out CHO57M.merged_cat_output.fastq_u.fastq_ec.fastq.fixed_assembly.fastq_sequence_min1000.fastq_metagenome.bowtie2.bz2 --input_type fasta -x mpa_vJan21_CHOCOPhlAnSGB_202103 --bowtie2db /storage01/home/ksugino/mpa_db/ --nproc 4
+    qiime tools import \
+     --type 'SampleData[PairedEndSequencesWithQuality]' \
+     --input-path sample_file_list.tsv \
+     --output-path paired-end-demux.qza \
+     --input-format PairedEndFastqManifestPhred33V2
+
+    ...
+    ...
+    ...
 
 -   The header looks similar to OSCERs SGE setup, but I haven’t bothered
     to designate the time or memory needed by my programs; these are
     private servers for just the HHDC (at the moment at least) so there
     are fewer issues with memory and time allocations–they just use
     what’s needed
--   Note that I designate 4 nodes (-n 4) and I subsequently designate
-    the number of processors I’ve allocated in the code for metaphlan
-    (–nproc 4)
-    -   I honestly don’t understand how the multithread processing
-        works, but in short, it’s a way to put more resources towards a
-        job so that it runs faster (though I’m sure it’s much deeper
-        than that)
