@@ -1,7 +1,5 @@
--   [1
-    Basics-of-16S-sequence-processing-on-SGE-cluster-servers](#basics-of-16s-sequence-processing-on-sge-cluster-servers)
-    -   [1.1 Introduction: submitting batch jobs on SGE
-        servers](#introduction-submitting-batch-jobs-on-sge-servers)
+-   [1 Introduction: submitting batch jobs on SGE
+    servers](#introduction-submitting-batch-jobs-on-sge-servers)
 -   [2 Required files](#required-files)
     -   [2.1 Annotation databases: greengenes2 and
         SILVA](#annotation-databases-greengenes2-and-silva)
@@ -10,7 +8,7 @@
     -   [3.2 Example of LSF batch file for Mustang
         servers](#example-of-lsf-batch-file-for-mustang-servers)
 
-# 1 Basics-of-16S-sequence-processing-on-SGE-cluster-servers
+Basics-of-16S-sequence-processing-on-SGE-cluster-servers
 
 This goes over the basics for processing 16S sequence data on a cluster
 server, using the LSF platform as the example. We will go over
@@ -18,7 +16,7 @@ formatting a batch job, submitting a batch job, checking the status of
 jobs, and cancelling a job. Within QIIME, we will QC and trim the reads,
 create OTU tables, and annotate the taxonomic IDs using greengenes2.
 
-## 1.1 Introduction: submitting batch jobs on SGE servers
+# 1 Introduction: submitting batch jobs on SGE servers
 
 -   This is a companion doc to the batchfile
     “qiime\_processing\_batch\_file.batch”, which contains the code to
@@ -31,8 +29,8 @@ create OTU tables, and annotate the taxonomic IDs using greengenes2.
     install packages if you ask).
     -   The OSCER servers in Norman operate on SGE, while the OUHSC
         Mustang servers use LSF.
-        -   More info can be found at:
-            <https://www.med.upenn.edu/hpc/assets/user-content/documents/SGE_to_LSF_User_Migration_Guide.pdf>
+        -   [More info can be found at
+            here](https://www.med.upenn.edu/hpc/assets/user-content/documents/SGE_to_LSF_User_Migration_Guide.pdf)
 -   For our purposes, the only difference between the two is syntax.
     Let’s look at the batch file header for SGE on the Norman OSCER
     servers, which uses qsub to submit jobs:
@@ -89,14 +87,14 @@ create OTU tables, and annotate the taxonomic IDs using greengenes2.
 ## 2.1 Annotation databases: greengenes2 and SILVA
 
 -   One other thing to note before we get into the code: I’m using the
-    greengenes2 database for this run
-    (<https://forum.qiime2.org/t/introducing-greengenes2-2022-10/25291>).
-    It’s required to get gene annotation predictions from Picrust2
-    (<https://github.com/picrust/picrust2/wiki>).
+    [greengenes2](https://forum.qiime2.org/t/introducing-greengenes2-2022-10/25291)
+    database for this run . It’s required to get gene annotation
+    predictions from
+    [Picrust2](https://github.com/picrust/picrust2/wiki).
     -   Check the link to gg2 for other run conditions; notably, there
         are different commands for V4 vs non-V4 sequencing regions.
 -   The gg2 database was just updated last year, but you can also use
-    other annotation DBs like SILVA (<https://www.arb-silva.de/>)
+    other annotation DBs like [SILVA](https://www.arb-silva.de/)
     -   If you use SILVA, you’ll need to look up how to download and
         process the database so that it is in a correct format for your
         needs; Google is your friend!
@@ -105,10 +103,12 @@ create OTU tables, and annotate the taxonomic IDs using greengenes2.
 
 -   There are many pipelines online showing you how to use QIIME with
     different types of sequencing data, different annotation databases,
-    etc. This is a pretty good one and covers more than we will here:
-    -   <https://chmi-sops.github.io/mydoc_qiime2.html>
+    etc. This is a pretty good one and covers more than we will
+    [here](https://chmi-sops.github.io/mydoc_qiime2.html)
+
 -   The full batch file to run QIIME on raw 16S sequences looks like
     this:
+
     -   See the comments in the code for more info on how to alter the
         run parameters
 
