@@ -77,7 +77,11 @@ This goes over the basics for processing 16S sequence data on a cluster server, 
 
 module load python
 module load QIIME2
+```
 
+## Import and QC
+
+```{r, echo=T, eval=F}
 #sample_file_list.tsv is in here. This basically is a tab-separated (the .ts part of tsv) text file containing sample names in column 1, forward read file in column 2, and reverse read file in column 3
 #I usually pull the sequence names via the command line using ls to output my file. You can also assemble the file in excel (though I'd still use ls and copy/paste the file names to save some time)
 qiime tools import \
@@ -101,7 +105,11 @@ qiime dada2 denoise-paired \
   --o-representative-sequences rep-seqs-1.qza \
   --o-table table-1.qza \
   --o-denoising-stats stats-1.qza
+```
 
+## Output raw taxonomy tables
+
+```{r, echo=T, eval=F}
 qiime metadata tabulate \
   --m-input-file stats-1.qza \
   --o-visualization denoising-stats-1.qzv
@@ -122,7 +130,11 @@ qiime tools export \
 cd exported-otu-table
 biom convert -i feature-table.biom -o table.from_biom.txt --to-tsv
 cd ../ #need to move back to the main folder
+```
 
+## Annotate raw otu table to gg2 db
+
+```{r, echo=T, eval=F}
 ###
 #greengenes2 annotations
 # See this link for more info on gg2 and how to use it:
@@ -147,7 +159,7 @@ qiime greengenes2 taxonomy-from-table \
 ```
 
 
-## Basic LSF commands
+# Basic LSF commands
 * That's basically it! Using the HPC servers is a whole other thing that I don't want to get into, but to run this job on the OSCER servers, you'd need to set up a few things:
   * Put all the sequences, batch job, and other files in a folder
   * Navigate to the folder with your data, and run:

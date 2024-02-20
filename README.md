@@ -4,8 +4,12 @@
     -   [2.1 Annotation databases: greengenes2 and
         SILVA](#annotation-databases-greengenes2-and-silva)
 -   [3 Batch file example](#batch-file-example)
-    -   [3.1 Basic LSF commands](#basic-lsf-commands)
-    -   [3.2 Example of LSF batch file for Mustang
+    -   [3.1 Import and QC](#import-and-qc)
+    -   [3.2 Output raw taxonomy tables](#output-raw-taxonomy-tables)
+    -   [3.3 Annotate raw otu table to gg2
+        db](#annotate-raw-otu-table-to-gg2-db)
+-   [4 Basic LSF commands](#basic-lsf-commands)
+    -   [4.1 Example of LSF batch file for Mustang
         servers](#example-of-lsf-batch-file-for-mustang-servers)
 
 Basics-of-16S-sequence-processing-on-SGE-cluster-servers
@@ -128,6 +132,8 @@ create OTU tables, and annotate the taxonomic IDs using greengenes2.
     module load python
     module load QIIME2
 
+## 3.1 Import and QC
+
     #sample_file_list.tsv is in here. This basically is a tab-separated (the .ts part of tsv) text file containing sample names in column 1, forward read file in column 2, and reverse read file in column 3
     #I usually pull the sequence names via the command line using ls to output my file. You can also assemble the file in excel (though I'd still use ls and copy/paste the file names to save some time)
     qiime tools import \
@@ -152,6 +158,8 @@ create OTU tables, and annotate the taxonomic IDs using greengenes2.
       --o-table table-1.qza \
       --o-denoising-stats stats-1.qza
 
+## 3.2 Output raw taxonomy tables
+
     qiime metadata tabulate \
       --m-input-file stats-1.qza \
       --o-visualization denoising-stats-1.qzv
@@ -172,6 +180,8 @@ create OTU tables, and annotate the taxonomic IDs using greengenes2.
     cd exported-otu-table
     biom convert -i feature-table.biom -o table.from_biom.txt --to-tsv
     cd ../ #need to move back to the main folder
+
+## 3.3 Annotate raw otu table to gg2 db
 
     ###
     #greengenes2 annotations
@@ -195,7 +205,7 @@ create OTU tables, and annotate the taxonomic IDs using greengenes2.
         --i-table gg2.biom.qza \
         --o-classification gg2.taxonomy.qza
 
-## 3.1 Basic LSF commands
+# 4 Basic LSF commands
 
 -   That’s basically it! Using the HPC servers is a whole other thing
     that I don’t want to get into, but to run this job on the OSCER
@@ -221,7 +231,7 @@ create OTU tables, and annotate the taxonomic IDs using greengenes2.
 
     scancel *jobID*
 
-## 3.2 Example of LSF batch file for Mustang servers
+## 4.1 Example of LSF batch file for Mustang servers
 
 -   So, I have less experience with LSF on the OUHSC servers, but I can
     show how I’ve been submitting jobs:
